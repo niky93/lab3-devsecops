@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  JAVA_VERSION: '25'
+  JAVA_VERSION: '21'
   MAVEN_OPTS: '-Xmx2g'
   SKIP_SCA: 'false'  # Set to 'true' to skip SCA (Dependency-Check) step and moving to nightly
 
@@ -153,7 +153,7 @@ jobs:
         run: |
           mvn -B clean compile \
               com.github.spotbugs:spotbugs-maven-plugin:check \
-              org.apache.maven.plugins:maven-pmd-plugin:check || true
+              org.apache.maven.plugins:maven-pmd-plugin:check
 
       - name: Upload SpotBugs / PMD reports
         uses: actions/upload-artifact@v4
