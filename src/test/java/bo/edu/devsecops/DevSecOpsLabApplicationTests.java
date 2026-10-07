@@ -8,6 +8,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -15,6 +16,13 @@ class DevSecOpsLabApplicationTests {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Test
+    void productSearchTreatsSqlInjectionAsText() throws Exception {
+        mockMvc.perform(get("/api/products/search").param("name", "' OR 1=1 --"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$" ).isEmpty());
+    }
 
     @Test
     void productSearchIsAvailable() throws Exception {

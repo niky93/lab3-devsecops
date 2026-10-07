@@ -2,7 +2,7 @@ name: Security - Semgrep
 
 on:
   push:
-    branches: [feature/**', 'bugfix/**', 'hotfix/**']
+    branches: ['feature/**', 'bugfix/**', 'hotfix/**']
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
@@ -31,6 +31,9 @@ jobs:
             --json-output=semgrep-results.json \
             --sarif-output=semgrep-results.sarif \
             src/main/java
+
+      - name: Quality Gate - evaluar reporte Semgrep
+        run: python3 scripts/semgrep_gate.py semgrep-results.json
 
       - name: Publicar reportes de Semgrep
         if: always()

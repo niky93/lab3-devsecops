@@ -1,0 +1,15 @@
+<FindBugsFilter>
+    <!-- Spring injects a shared JdbcTemplate. These constructors retain it intentionally;
+         neither controller exposes it or changes its configuration. Limit this exclusion
+         to this warning and these constructor signatures; all other checks remain active. -->
+    <Match>
+        <Class name="bo.edu.devsecops.controller.AdminController"/>
+        <Method name="&lt;init&gt;" params="org.springframework.jdbc.core.JdbcTemplate" returns="void"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="bo.edu.devsecops.controller.ProductController"/>
+        <Method name="&lt;init&gt;" params="org.springframework.jdbc.core.JdbcTemplate" returns="void"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+</FindBugsFilter>

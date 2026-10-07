@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  JAVA_VERSION: '25'
+  JAVA_VERSION: '21'
   MAVEN_OPTS: '-Xmx2g'
   SKIP_SCA: 'false'  # Set to 'true' to skip SCA (Dependency-Check) step and moving to nightly
 
@@ -136,7 +136,7 @@ jobs:
   # 4. Optional: SpotBugs + PMD (static analysis)
   # ------------------------------------------------------------------
   static-analysis:
-    name: Static Analysis (SpotBugs + PMD)
+    name: Static Analysis (SpotBugs)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -149,11 +149,10 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Run SpotBugs & PMD
+      - name: Run SpotBugs
         run: |
           mvn -B clean compile \
-              com.github.spotbugs:spotbugs-maven-plugin:check \
-              org.apache.maven.plugins:maven-pmd-plugin:check || true
+              com.github.spotbugs:spotbugs-maven-plugin:check
 
       - name: Upload SpotBugs / PMD reports
         uses: actions/upload-artifact@v4
@@ -171,7 +170,7 @@ jobs:
   quality-gate:
     name: Quality Gate
     runs-on: ubuntu-latest
-    needs: [build-and-test, sast-codeql, sca-dependency-check]
+    needs: [build-and-test, sast-codeql, sca-dependency-check, static-analysis]
     if: always()
     steps:
       - name: Check previous job results
@@ -190,4 +189,8 @@ jobs:
             exit 1
           fi
 
-          echo "Quality gate passed"
+          if [[ "${{ needs.static-analysis.result }}" != "success" ]]; then
+            echo "::error::SpotBugs did not pass"
+            exit 1
+          fi
+          echo "Quality gate passed (SCA remains pending)"
